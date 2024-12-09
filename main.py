@@ -1,0 +1,476 @@
+'''Due to problems while coding I am recreating the main menu which was before and adding comments new things to implement
+
+Tag designer creator:
+'''
+
+'''
+Next TO-DOs:
+- health system *
+- sound effects 
+
+'''
+
+# Import necessary libraries -  Remember to check if any of then were forgotten
+import pygame # Main game library for creating the game
+import random # For random number generation
+import math # For mathematical operations
+import os # For file path operations
+from os import listdir # To list all files in a directory
+from os.path import isfile, join # To work with file paths and check file
+
+# Start Pygame
+pygame.init()
+pygame.font.init()
+
+# Set up the game window
+pygame.display.set_caption("Forest and Hooves")
+WIDTH, HEIGHT = 1000, 800 
+window = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# Game constants for smooth gameplay
+FPS = 60  # Frames per second, controls the speed of the game loop
+PLAYER_VEL = 7  # Speed of the player’s movement
+
+#   Function to flip sprites horizontally 
+def flip(sprites):
+    """
+    Flips a list of sprites horizontally for left movement.
+    Args:
+        sprites (list): List of Pygame surface objects (frames).
+    Returns:
+        list: Flipped sprites.
+    """
+    return [pygame.transform.flip(sprite, True, False) for sprite in sprites] # Flips each frame horizontally
+
+#                   Function to load sprite sheets
+def load_sprite_sheets(dir1, dir2, width, height, direction=False):
+    """
+    Loads sprites from sprite sheets, organizes them by action and direction.
+    Args:
+        dir1 (str): Main folder name.
+        dir2 (str): Subfolder name.
+        width (int): Width of each sprite frame.
+        height (int): Height of each sprite frame.
+        direction (bool): Whether to load directional sprites.
+    Returns:
+        dict: Dictionary of sprite animations.
+    """
+    path = join("GAME PROJECT", "assets", dir1, dir2) # Builds the path to the folder containing the sprite sheets
+    images = [f for f in listdir(path) if isfile(join(path, f))] # Lists all files in the folder
+
+    all_sprites = {} # Dictionary to hold all loaded sprites
+
+    for image in images:  # Loops through each sprite sheet
+        sprite_sheet = pygame.image.load(join(path, image)).convert_alpha() # Loads the sprite sheet with transparency
+
+        sprites = [] # List to store individual frames
+        for i in range(sprite_sheet.get_width() // width): # Loops through each frame in the sprite sheet
+            surface = pygame.Surface((width, height), pygame.SRCALPHA, 32) # Creates a blank surface for a frame
+            rect = pygame.Rect(i * width, 0, width, height) # Defines the area of the current frame
+            surface.blit(sprite_sheet, (0, 0), rect) # Copies the frame from the sprite sheet to the surface
+            sprites.append(pygame.transform.scale2x(surface)) # Doubles the size of the frame and adds to the list
+
+        if direction: # If the sprites have directional movement
+            all_sprites[image.replace(".png", "") + "_right"] = sprites  # Store right-facing sprites
+            all_sprites[image.replace(".png", "") + "_left"] = flip(sprites) # Store flipped (left-facing) sprites
+        else:
+            all_sprites[image.replace(".png", "")] = sprites # Store non-directional sprites
+
+    return all_sprites  # Return all loaded sprites as a dictionary
+
+#         Function to get block images 
+def get_block(size):
+    """
+    Loads a block image from the terrain sprite sheet.
+    Args:
+        size (int): Size of the block.
+    Returns:
+        pygame.Surface: Scaled block surface.
+    """
+    path = join("GAME PROJECT", "assets", "Terrain", "jungle tileset.png") # Path to the terrain image
+    image = pygame.image.load(path).convert_alpha() # Loads the terrain sprite sheet with transparency
+    surface = pygame.Surface((size, size), pygame.SRCALPHA, 32) # Creates a blank surface for the block
+    rect = pygame.Rect(76, 33, size, size) # Defines the rectangle of the block to extract
+    surface.blit(image, (0, 0), rect) # Copies the block from the sprite sheet to the surface
+    return pygame.transform.scale2x(surface)  # Doubles the block's size and returns it
+
+# Class to control the Player
+class Player(pygame.sprite.Sprite):
+    COLOR = (255, 0, 0)
+    GRAVITY = 2 # Gravity constant to pull the player down
+    SPRITES = load_sprite_sheets("MainCharac", "WhiteG", 72, 72, True) # Load player sprites
+    ANIMATION_DELAY = 2 # How quickly the animations change frames
+
+    def __init__(self, x, y, width, height):
+        """
+        Initializes the player.
+        Args:
+            x (int): Initial x-position.
+            y (int): Initial y-position.
+            width (int): Width of the player.
+            height (int): Height of the player.
+        """
+        super().__init__() # Call the parent class initializer
+        self.rect = pygame.Rect(x, y, width, height) # Create a rectangle for the player
+        self.x_vel = 0 # Initial horizontal velocity
+        self.y_vel = 0 # Initial vertical velocity
+        self.mask = None 
+        self.direction = "left" # Default direction
+        self.animation_count = 0
+        self.fall_count = 0
+        self.jump_count = 0
+        self.hit = False
+        self.hit_count = 0
+        self.last_hit_time = 0  # Track the last hit time
+        self.initial_position = (x, y)  # Store the initial position
+        self.hit_animation_duration = 30  # Duration of hit animation frames
+        self.hit_animation_count = 0  # Counter for hit animation frames
+
+    def jump(self): #Makes the player jump
+        self.y_vel = -self.GRAVITY * 7
+        self.animation_count = 0 # Reset animation count for jump
+        self.jump_count += 1
+        if self.jump_count == 1: # Reset animation count for jump
+            self.fall_count = 0
+
+    def move(self, dx, dy):
+        """
+        Moves the player by a given amount.
+        Args:
+            dx (int): Change in x-position.
+            dy (int): Change in y-position.
+        """
+        self.rect.x += dx # Update x-position
+        self.rect.y += dy # Update y-position
+
+    def make_hit(self, current_time):
+        if current_time - self.last_hit_time >= 2000:  # 2 seconds interval
+            self.hit = True
+            self.hit_count += 1
+            self.last_hit_time = current_time  # Update last hit time
+
+    def reset_position(self):
+        self.rect.topleft = self.initial_position  # Reset to initial position
+        self.y_vel = 0  # Reset vertical velocity
+        self.hit_count = 0  # Reset hit count
+        self.hit = False  # Reset hit state
+        return self.initial_position[0]  # Return the x position for resetting the view
+
+    def move_left(self, vel): # Moves the player left. Args: vel (int): Speed of movement.
+        self.x_vel = -vel # Set negative velocity for left movement
+        if self.direction != "left": # Update direction
+            self.direction = "left"
+            self.animation_count = 0 
+    def move_right(self, vel): #Moves the player right. Args: vel (int): Speed of movement.
+        self.x_vel = vel # Set positive velocity for right movement
+        if self.direction != "right": # Update direction
+            self.direction = "right"
+            self.animation_count = 0
+
+    def loop(self, fps):
+        self.y_vel += min(1, (self.fall_count / fps) * self.GRAVITY)
+        self.move(self.x_vel, self.y_vel)
+
+        if self.hit:
+            self.hit_animation_count += 1
+            if self.hit_animation_count >= self.hit_animation_duration:
+                self.hit = False  # Reset hit state after animation
+                self.hit_animation_count = 0  # Reset animation counter
+        self.fall_count += 1
+        self.update_sprite()
+
+    def landed(self): # Resets jump and fall counters when the player lands.
+        self.fall_count = 0
+        self.y_vel = 0
+        self.jump_count = 0
+
+    def hit_head(self):
+        self.count = 0
+        self.y_vel *= -1
+
+    def update_sprite(self): #Updates the player's sprite based on the current direction and animation state.
+        sprite_sheet = "idle"
+        if self.hit:
+            sprite_sheet = "hit"
+        elif self.y_vel < 0:
+            if self.jump_count == 1:
+                sprite_sheet = "jump"
+            elif self.jump_count == 2:
+                sprite_sheet = "jump"
+        elif self.y_vel > self.GRAVITY * 2:
+            sprite_sheet = "fall"
+        elif self.x_vel != 0:
+            sprite_sheet = "run"
+
+        sprite_sheet_name = sprite_sheet + "_" + self.direction
+        sprites = self.SPRITES[sprite_sheet_name]
+        sprite_index = (self.animation_count // self.ANIMATION_DELAY) % len(sprites)
+        self.sprite = sprites[sprite_index]
+        self.animation_count += 1
+        self.update()
+
+    def update(self):
+        self.rect = self.sprite.get_rect(topleft=(self.rect.x, self.rect.y))
+        self.mask = pygame.mask.from_surface(self.sprite)
+
+    def draw(self, win, offset_x): #Draws the player on the screen. Args: win (pygame.Surface): The game window.
+        win.blit(self.sprite, (self.rect.x - offset_x, self.rect.y)) # Draw the player sprite
+
+
+class Object(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height, name=None):
+        super().__init__()
+        self.rect = pygame.Rect(x, y, width, height)
+        self.image = pygame.Surface((width, height), pygame.SRCALPHA)
+        self.width = width
+        self.height = height
+        self.name = name
+
+    def draw(self, win, offset_x):
+        win.blit(self.image, (self.rect.x - offset_x, self.rect.y))
+
+
+class Block(Object):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, size, size)
+        block = get_block(size)
+        self.image.blit(block, (0, 0))
+        self.mask = pygame.mask.from_surface(self.image)
+
+
+class Fire(Object):
+    ANIMATION_DELAY = 2
+
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height, "fire")
+        self.fire = load_sprite_sheets("Objects", "Fire", width, height)
+        self.image = self.fire["off"][0]
+        self.mask = pygame.mask.from_surface(self.image)
+        self.animation_count = 0
+        self.animation_name = "on"
+
+    def on(self):
+        self.animation_name = "on"
+
+    def off(self):
+        self.animation_name = "off"
+
+    def loop(self):
+        sprites = self.fire[self.animation_name]
+        sprite_index = (self.animation_count // self.ANIMATION_DELAY) % len(sprites)
+        self.image = sprites[sprite_index]
+        self.animation_count += 1
+
+        self.rect = self.image.get_rect(topleft=(self.rect.x, self.rect.y))
+        self.mask = pygame.mask.from_surface(self.image)
+
+        if self.animation_count // self.ANIMATION_DELAY > len(sprites):
+            self.animation_count = 0
+
+
+class Spike(Object):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height, "spike")
+        self.spike = load_sprite_sheets("Objects", "Spikes", width, height)
+        self.image = self.spike["Idle"][0]
+        self.mask = pygame.mask.from_surface(self.image)
+
+# Key class for collectible keys
+class Key(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()  # Initialize the parent class
+        self.image = pygame.image.load(join("assets", "KeyIcons.png")).convert_alpha()  # Load the key image
+        self.image = pygame.transform.scale(self.image, (32, 32))  # Scale the key image
+        self.rect = self.image.get_rect(topleft=(x, y))  # Set the position of the key
+
+# Function to create a new key
+def create_key():
+    x = WIDTH + random.randint(100, 200)  # Random x position for the key
+    y = random.randint(100, HEIGHT - 100)  # Random y position for the key
+    return Key(x, y)  # Return a new Key object
+
+# Obstacle class for recyclable items
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()  # Initialize the parent class
+        self.image = pygame.image.load(join("assets", "recicle_items.png")).convert_alpha()  # Load the obstacle image
+        self.image = pygame.transform.scale(self.image, (32, 32))  # Scale the obstacle image
+        self.rect = self.image.get_rect(topleft=(x, y))  # Set the position of the obstacle
+
+# Function to create a new obstacle
+def create_obstacle():
+    x = WIDTH + random.randint(100, 200)  # Random x position for the obstacle
+    y = random.randint(100, HEIGHT - 100)  # Random y position for the obstacle
+    return Obstacle(x, y)  # Return a new Obstacle object
+
+# Function to draw the win screen
+def draw_win_screen(window):
+    font = pygame.font.Font(None, 74)  # Create a font object
+    text = font.render("YOU WON", True, (255, 255, 255))  # Render the win text
+    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))  # Center the text
+    window.blit(text, text_rect)  # Draw the text on the window
+    pygame.display.update()  # Update the display
+    pygame.time.delay(2000)  # Wait for 2 seconds
+
+# Function to draw the game over screen
+def draw_game_over_screen(window):
+    font = pygame.font.Font(None, 74)  # Create a font object
+    text = font.render("GAME OVER", True, (255, 0, 0))  # Render the game over text
+    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))  # Center the text
+    window.blit(text, text_rect)  # Draw the text on the window
+    pygame.display.update()  # Update the display
+    pygame.time.delay(2000)  # Wait for 2 seconds
+
+def get_background(name):
+    """
+    Loads and tiles the background image.
+    Args:
+        name (str): Background image file name.
+    Returns:
+        list: Positions of tiled background.
+        pygame.Surface: Background image.
+    """
+    image = pygame.image.load(join("GAME PROJECT", "assets", "Background", name)) # Load background image
+    _, _, width, height = image.get_rect() # Get dimensions of the image
+    tiles = [] # List to store tile positions
+
+    for i in range(WIDTH // width + 1): # Loop for horizontal tiling
+        for j in range(HEIGHT // height + 1): # Loop for vertical tiling
+            pos = (i * width, j * height) # Calculate position for each tile
+            tiles.append(pos)  # Add position to the list
+
+    return tiles, image  # Return positions and image
+
+#Main drawing function 
+def draw(window, background, bg_image, player, objects, offset_x):
+    """
+    Draws all game elements on the screen.
+    Args:
+        window (pygame.Surface): The game window.
+        background (list): Tiled background positions.
+        bg_image (pygame.Surface): Background image.
+        player (Player): Player object.
+        offset_x (int): Scrolling offset.
+    """
+    for tile in background: # Loop through all background tiles
+        window.blit(bg_image, tile) # Draw each tile at its position
+
+    for obj in objects:
+        obj.draw(window, offset_x)
+
+    player.draw(window, offset_x)  # Draw the player
+
+    pygame.display.update()# Update the display
+
+
+def handle_vertical_collision(player, objects, dy):
+    collided_objects = []
+    for obj in objects:
+        if pygame.sprite.collide_mask(player, obj):
+            if dy > 0:
+                player.rect.bottom = obj.rect.top
+                player.landed()
+            elif dy < 0:
+                player.rect.top = obj.rect.bottom
+                player.hit_head()
+
+            collided_objects.append(obj)
+
+    return collided_objects
+
+
+def collide(player, objects, dx):
+    player.move(dx, 0)
+    player.update()
+    collided_object = None
+    for obj in objects:
+        if pygame.sprite.collide_mask(player, obj):
+            collided_object = obj
+            break
+
+    player.move(-dx, 0)
+    player.update()
+    return collided_object
+
+
+def handle_move(player, objects):
+    keys = pygame.key.get_pressed()
+
+    player.x_vel = 0
+    collide_left = collide(player, objects, -PLAYER_VEL * 2)
+    collide_right = collide(player, objects, PLAYER_VEL * 2)
+
+    if keys[pygame.K_LEFT] and not collide_left:
+        player.move_left(PLAYER_VEL)
+    if keys[pygame.K_RIGHT] and not collide_right:
+        player.move_right(PLAYER_VEL)
+
+    vertical_collide = handle_vertical_collision(player, objects, player.y_vel)
+    to_check = [collide_left, collide_right, *vertical_collide]
+
+    for obj in to_check:
+        if obj and obj.name == "fire":
+            player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
+        if obj and obj.name == "spike":
+            player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
+
+
+def main(window):
+    clock = pygame.time.Clock()
+    background, bg_image = get_background("green.png")
+
+    block_size = 100
+
+    player = Player(100, 100, 50, 50)
+    spike = Spike(350, HEIGHT - block_size - 64, 16, 32)
+    fire = Fire(250, HEIGHT - block_size - 64, 16, 32)
+    fire.on()
+
+    floor = [Block(i * block_size, HEIGHT - block_size, block_size)
+             for i in range(-WIDTH // block_size, (WIDTH * 12) // block_size)]
+    objects = [*floor, Block(-800, HEIGHT - block_size * 2, block_size), Block(-800, HEIGHT - block_size * 3, block_size),
+               Block(-800, HEIGHT - block_size * 4, block_size), Block(-800, HEIGHT - block_size * 5, block_size),
+               Block(-800, HEIGHT - block_size * 6, block_size), Block(-800, HEIGHT - block_size * 7, block_size),
+               Block(block_size * 3, HEIGHT - block_size * 4, block_size), Fire(-250, HEIGHT - block_size - 64, 16, 32),
+               Spike(350, HEIGHT - block_size - 32, 16, 32),Spike(1560, HEIGHT - block_size - 32, 16, 32)]
+
+    offset_x = 0
+    scroll_area_width = 200
+    y_floor = HEIGHT  # Define the floor level
+
+    run = True
+    while run:
+        clock.tick(FPS)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                break
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and player.jump_count < 2:
+                    player.jump()
+
+        player.loop(FPS)
+        fire.loop()
+        handle_move(player, objects)
+        draw(window, background, bg_image, player, objects, offset_x)
+
+        # Check if the player has fallen below the floor
+        if player.rect.y > y_floor:
+            offset_x = player.reset_position()  # Reset player position and update offset_x
+
+        # Check if the player has been hit 3 times
+        if player.hit_count >= 3:
+            offset_x = player.reset_position()  # Reset player position and update offset_x
+
+        if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
+                (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
+            offset_x += player.x_vel
+
+    pygame.quit()
+    quit()
+
+
+if __name__ == "__main__":
+    main(window)
