@@ -145,7 +145,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += dy # Update y-position
 
     def make_hit(self, current_time):
-        if current_time - self.last_hit_time >= 2000:  # 2 seconds interval
+        if current_time - self.last_hit_time >= 500:  # 0.5 seconds interval
             self.hit = True
             self.hit_count += 1
             self.last_hit_time = current_time  # Update last hit time
@@ -375,8 +375,8 @@ def handle_move(player, objects):
     keys = pygame.key.get_pressed()
 
     player.x_vel = 0
-    collide_left = collide(player, objects, -PLAYER_VEL * 5.5)
-    collide_right = collide(player, objects, PLAYER_VEL * 5.5)
+    collide_left = collide(player, objects, -PLAYER_VEL * 6)
+    collide_right = collide(player, objects, PLAYER_VEL * 6)
 
     if keys[pygame.K_LEFT] and not collide_left:
         player.move_left(PLAYER_VEL)
