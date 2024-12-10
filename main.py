@@ -8,7 +8,6 @@ Next TO-DOs:
 - map 
 - keys (separate in 3 diffferent keys)
 - sound effects 
-- delete fire
 
 '''
 
@@ -240,36 +239,6 @@ class Block(Object):
         self.mask = pygame.mask.from_surface(self.image)
 
 
-class Fire(Object):
-    ANIMATION_DELAY = 2
-
-    def __init__(self, x, y, width, height):
-        super().__init__(x, y, width, height, "fire")
-        self.fire = load_sprite_sheets("Objects", "Fire", width, height)
-        self.image = self.fire["off"][0]
-        self.mask = pygame.mask.from_surface(self.image)
-        self.animation_count = 0
-        self.animation_name = "on"
-
-    def on(self):
-        self.animation_name = "on"
-
-    def off(self):
-        self.animation_name = "off"
-
-    def loop(self):
-        sprites = self.fire[self.animation_name]
-        sprite_index = (self.animation_count // self.ANIMATION_DELAY) % len(sprites)
-        self.image = sprites[sprite_index]
-        self.animation_count += 1
-
-        self.rect = self.image.get_rect(topleft=(self.rect.x, self.rect.y))
-        self.mask = pygame.mask.from_surface(self.image)
-
-        if self.animation_count // self.ANIMATION_DELAY > len(sprites):
-            self.animation_count = 0
-
-
 class Spike(Object):
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height, "spike")
@@ -305,6 +274,13 @@ class Big_Plastic(Object):
         self.image = self.bigplastic["Idle"][0]
         self.mask = pygame.mask.from_surface(self.image)
 
+class Pizza(Object):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height, "pizza")
+        self.pizza = load_sprite_sheets("Objects", "Pizza", width, height)
+        self.image = self.pizza["Idle"][0]
+        self.mask = pygame.mask.from_surface(self.image)
+
 
 # Key class for collectible keys
 class Key(pygame.sprite.Sprite):
@@ -318,15 +294,6 @@ class Key(pygame.sprite.Sprite):
 def draw_win_screen(window):
     font = pygame.font.Font(None, 74)  # Create a font object
     text = font.render("YOU WON", True, (255, 255, 255))  # Render the win text
-    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))  # Center the text
-    window.blit(text, text_rect)  # Draw the text on the window
-    pygame.display.update()  # Update the display
-    pygame.time.delay(2000)  # Wait for 2 seconds
-
-# Function to draw the game over screen
-def draw_game_over_screen(window):
-    font = pygame.font.Font(None, 74)  # Create a font object
-    text = font.render("GAME OVER", True, (255, 0, 0))  # Render the game over text
     text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))  # Center the text
     window.blit(text, text_rect)  # Draw the text on the window
     pygame.display.update()  # Update the display
@@ -408,8 +375,8 @@ def handle_move(player, objects):
     keys = pygame.key.get_pressed()
 
     player.x_vel = 0
-    collide_left = collide(player, objects, -PLAYER_VEL * 6)
-    collide_right = collide(player, objects, PLAYER_VEL * 6)
+    collide_left = collide(player, objects, -PLAYER_VEL * 5.5)
+    collide_right = collide(player, objects, PLAYER_VEL * 5.5)
 
     if keys[pygame.K_LEFT] and not collide_left:
         player.move_left(PLAYER_VEL)
@@ -420,8 +387,6 @@ def handle_move(player, objects):
     to_check = [collide_left, collide_right, *vertical_collide]
 
     for obj in to_check:
-        if obj and obj.name == "fire":
-            player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
         if obj and obj.name == "spike":
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
         if obj and obj.name == "bigplastic":
@@ -431,6 +396,8 @@ def handle_move(player, objects):
         if obj and obj.name == "metalcan":
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
         if obj and obj.name == "mug":
+            player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
+        if obj and obj.name == "pizza":
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
 
 
@@ -442,14 +409,12 @@ def main(window):
     block_size = 100
 
     player = Player(100, 100, 50, 50)
-    spike = Spike(350, HEIGHT - block_size - 64, 16, 32)
-    bigplastic = Big_Plastic(450, HEIGHT - block_size - 115, 41, 59)
-    mug = Mug(650, HEIGHT - block_size - 55, 31, 31)
-    cup = Cup(850, HEIGHT - block_size - 90, 30, 48)
-    metalcan= Metalcan(1050, HEIGHT - block_size - 88, 22, 44)
-
-    fire = Fire(250, HEIGHT - block_size - 64, 16, 32)
-    fire.on()
+    spike = Spike(100, HEIGHT - block_size - 64, 16, 32)
+    bigplastic = Big_Plastic(100, HEIGHT - block_size - 115, 41, 59)
+    mug = Mug(100, HEIGHT - block_size - 55, 31, 31)
+    cup = Cup(100, HEIGHT - block_size - 90, 30, 48)
+    metalcan= Metalcan(100, HEIGHT - block_size - 88, 22, 44)
+    pizza= Pizza(100, HEIGHT - block_size - 68.5,62,38)
 
     floor = [Block(i * block_size, HEIGHT - block_size, block_size)
              for i in range(-WIDTH // block_size, (WIDTH * 12) // block_size)]
@@ -460,6 +425,8 @@ def main(window):
                Block(block_size * 10, HEIGHT - block_size * 6, block_size),Block(block_size * 14, HEIGHT - block_size * 6, block_size),
                Block(block_size * 18, HEIGHT - block_size * 4, block_size), Block(block_size * 21, HEIGHT - block_size * 4, block_size),
                Block(block_size * 24, HEIGHT - block_size * 4, block_size),Block(block_size * 27, HEIGHT - block_size * 4, block_size),
+               Big_Plastic(block_size * 19.5, HEIGHT - block_size - 115, 41, 59),Big_Plastic(block_size * 22.5, HEIGHT - block_size - 115, 41, 59), 
+               Big_Plastic(block_size * 25.5, HEIGHT - block_size - 115, 41, 59), Mug(block_size * 24, HEIGHT - block_size*4 - 55, 31, 31),
                Block(block_size * 30, HEIGHT - block_size * 6, block_size), Block(block_size * 31, HEIGHT - block_size * 6, block_size),
                Block(block_size * 32, HEIGHT - block_size * 6, block_size), Spike(block_size*33, HEIGHT - block_size - 32, 16, 32),
                Spike(block_size*33.5, HEIGHT - block_size - 32, 16, 32),Spike(block_size*34, HEIGHT - block_size - 32, 16, 32),
@@ -468,6 +435,20 @@ def main(window):
                Spike(block_size*36.5, HEIGHT - block_size - 32, 16, 32),Spike(block_size*37, HEIGHT - block_size - 32, 16, 32),
                Spike(block_size*37.5, HEIGHT - block_size - 32, 16, 32),Spike(block_size*38, HEIGHT - block_size - 32, 16, 32),
                Spike(block_size*38.5, HEIGHT - block_size - 32, 16, 32), Spike(block_size*39, HEIGHT - block_size - 32, 16, 32),
+               Block(block_size * 44, HEIGHT - block_size * 4, block_size),Block(block_size * 45, HEIGHT - block_size * 5, block_size), 
+               Block(block_size * 46, HEIGHT - block_size * 4, block_size),Spike(block_size * 46, HEIGHT - block_size * 4 -32, 16, 32),
+               Spike(block_size * 46.5, HEIGHT - block_size * 4 -32, 16, 32), Big_Plastic(block_size * 45, HEIGHT - block_size - 115, 41, 59),
+               Block(block_size * 48, HEIGHT - block_size * 6, block_size), Cup(block_size * 50, HEIGHT - block_size - 90, 30, 48),
+               Spike(block_size * 51, HEIGHT - block_size - 32, 16, 32),Spike(block_size * 53, HEIGHT - block_size - 32, 16, 32),
+               Cup(block_size * 54, HEIGHT - block_size - 90, 30, 48),Block(block_size * 57, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 58, HEIGHT - block_size * 4, block_size),Block(block_size * 59, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 60, HEIGHT - block_size * 4, block_size),Block(block_size * 61, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 62, HEIGHT - block_size * 4, block_size), Block(block_size * 63, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 64, HEIGHT - block_size * 4, block_size), Block(block_size * 65, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 66, HEIGHT - block_size * 4, block_size), Block(block_size * 67, HEIGHT - block_size * 4, block_size),
+               Pizza(block_size * 66, HEIGHT - block_size * 4 - 68.5,62,38), Block(block_size * 68, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 68, HEIGHT - block_size * 5, block_size), Block(block_size * 68, HEIGHT - block_size * 6, block_size),
+               Block(block_size * 68, HEIGHT - block_size * 7, block_size), Block(block_size * 68, HEIGHT - block_size * 8, block_size),
                Spike(350, HEIGHT - block_size - 32, 16, 32),Spike(1560, HEIGHT - block_size - 32, 16, 32)]
 
 
@@ -489,7 +470,6 @@ def main(window):
                     player.jump()
 
         player.loop(FPS)
-        fire.loop()
         handle_move(player, objects)
         draw(window, background, bg_image, player, objects, offset_x)
 
