@@ -5,8 +5,10 @@ Tag designer creator:
 
 '''
 Next TO-DOs:
-- health system *
+- map 
+- keys (separate in 3 diffferent keys)
 - sound effects 
+- delete fire
 
 '''
 
@@ -275,6 +277,35 @@ class Spike(Object):
         self.image = self.spike["Idle"][0]
         self.mask = pygame.mask.from_surface(self.image)
 
+class Cup(Object):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height, "cup")
+        self.cup = load_sprite_sheets("Objects", "Cup", width, height)
+        self.image = self.cup["Idle"][0]
+        self.mask = pygame.mask.from_surface(self.image)
+
+class Mug(Object):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height, "mug")
+        self.mug = load_sprite_sheets("Objects", "Mug", width, height)
+        self.image = self.mug["idle"][0]
+        self.mask = pygame.mask.from_surface(self.image)
+
+class Metalcan(Object):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height, "metalcan")
+        self.metalcan = load_sprite_sheets("Objects", "Metalcan", width, height)
+        self.image = self.metalcan["Idle"][0]
+        self.mask = pygame.mask.from_surface(self.image)
+    
+class Big_Plastic(Object):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height, "bigplastic")
+        self.bigplastic = load_sprite_sheets("Objects", "Big Plastic", width, height)
+        self.image = self.bigplastic["Idle"][0]
+        self.mask = pygame.mask.from_surface(self.image)
+
+
 # Key class for collectible keys
 class Key(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -282,26 +313,6 @@ class Key(pygame.sprite.Sprite):
         self.image = pygame.image.load(join("assets", "KeyIcons.png")).convert_alpha()  # Load the key image
         self.image = pygame.transform.scale(self.image, (32, 32))  # Scale the key image
         self.rect = self.image.get_rect(topleft=(x, y))  # Set the position of the key
-
-# Function to create a new key
-def create_key():
-    x = WIDTH + random.randint(100, 200)  # Random x position for the key
-    y = random.randint(100, HEIGHT - 100)  # Random y position for the key
-    return Key(x, y)  # Return a new Key object
-
-# Obstacle class for recyclable items
-class Obstacle(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()  # Initialize the parent class
-        self.image = pygame.image.load(join("assets", "recicle_items.png")).convert_alpha()  # Load the obstacle image
-        self.image = pygame.transform.scale(self.image, (32, 32))  # Scale the obstacle image
-        self.rect = self.image.get_rect(topleft=(x, y))  # Set the position of the obstacle
-
-# Function to create a new obstacle
-def create_obstacle():
-    x = WIDTH + random.randint(100, 200)  # Random x position for the obstacle
-    y = random.randint(100, HEIGHT - 100)  # Random y position for the obstacle
-    return Obstacle(x, y)  # Return a new Obstacle object
 
 # Function to draw the win screen
 def draw_win_screen(window):
@@ -413,6 +424,15 @@ def handle_move(player, objects):
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
         if obj and obj.name == "spike":
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
+        if obj and obj.name == "bigplastic":
+            player.make_hit(pygame.time.get_ticks())  # Call make_hit with current 
+        if obj and obj.name == "cup":
+            player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
+        if obj and obj.name == "metalcan":
+            player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
+        if obj and obj.name == "mug":
+            player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
+
 
 
 def main(window):
@@ -423,6 +443,11 @@ def main(window):
 
     player = Player(100, 100, 50, 50)
     spike = Spike(350, HEIGHT - block_size - 64, 16, 32)
+    bigplastic = Big_Plastic(450, HEIGHT - block_size - 115, 41, 59)
+    mug = Mug(650, HEIGHT - block_size - 55, 31, 31)
+    cup = Cup(850, HEIGHT - block_size - 90, 30, 48)
+    metalcan= Metalcan (1050, HEIGHT - block_size - 64, 22, 44)
+
     fire = Fire(250, HEIGHT - block_size - 64, 16, 32)
     fire.on()
 
@@ -431,7 +456,7 @@ def main(window):
     objects = [*floor, Block(-800, HEIGHT - block_size * 2, block_size), Block(-800, HEIGHT - block_size * 3, block_size),
                Block(-800, HEIGHT - block_size * 4, block_size), Block(-800, HEIGHT - block_size * 5, block_size),
                Block(-800, HEIGHT - block_size * 6, block_size), Block(-800, HEIGHT - block_size * 7, block_size),
-               Block(block_size * 3, HEIGHT - block_size * 4, block_size), Fire(-250, HEIGHT - block_size - 64, 16, 32),
+               Block(block_size * 3, HEIGHT - block_size * 4, block_size), Metalcan(1050, HEIGHT - block_size - 88, 22, 44),
                Spike(350, HEIGHT - block_size - 32, 16, 32),Spike(1560, HEIGHT - block_size - 32, 16, 32)]
 
     offset_x = 0
