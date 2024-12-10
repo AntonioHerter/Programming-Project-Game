@@ -99,7 +99,7 @@ def get_block(size):
 # Class to control the Player
 class Player(pygame.sprite.Sprite):
     COLOR = (255, 0, 0)
-    GRAVITY = 2 # Gravity constant to pull the player down
+    GRAVITY = 1.8 # Gravity constant to pull the player down
     SPRITES = load_sprite_sheets("MainCharac", "WhiteG", 72, 72, True) # Load player sprites
     ANIMATION_DELAY = 2 # How quickly the animations change frames
 
@@ -408,8 +408,8 @@ def handle_move(player, objects):
     keys = pygame.key.get_pressed()
 
     player.x_vel = 0
-    collide_left = collide(player, objects, -PLAYER_VEL * 2)
-    collide_right = collide(player, objects, PLAYER_VEL * 2)
+    collide_left = collide(player, objects, -PLAYER_VEL * 6)
+    collide_right = collide(player, objects, PLAYER_VEL * 6)
 
     if keys[pygame.K_LEFT] and not collide_left:
         player.move_left(PLAYER_VEL)
@@ -446,7 +446,7 @@ def main(window):
     bigplastic = Big_Plastic(450, HEIGHT - block_size - 115, 41, 59)
     mug = Mug(650, HEIGHT - block_size - 55, 31, 31)
     cup = Cup(850, HEIGHT - block_size - 90, 30, 48)
-    metalcan= Metalcan (1050, HEIGHT - block_size - 64, 22, 44)
+    metalcan= Metalcan(1050, HEIGHT - block_size - 88, 22, 44)
 
     fire = Fire(250, HEIGHT - block_size - 64, 16, 32)
     fire.on()
@@ -456,8 +456,20 @@ def main(window):
     objects = [*floor, Block(-800, HEIGHT - block_size * 2, block_size), Block(-800, HEIGHT - block_size * 3, block_size),
                Block(-800, HEIGHT - block_size * 4, block_size), Block(-800, HEIGHT - block_size * 5, block_size),
                Block(-800, HEIGHT - block_size * 6, block_size), Block(-800, HEIGHT - block_size * 7, block_size),
-               Block(block_size * 3, HEIGHT - block_size * 4, block_size), Metalcan(1050, HEIGHT - block_size - 88, 22, 44),
+               Block(block_size * 3, HEIGHT - block_size * 4, block_size),Block(block_size * 6, HEIGHT - block_size * 6, block_size),
+               Block(block_size * 10, HEIGHT - block_size * 6, block_size),Block(block_size * 14, HEIGHT - block_size * 6, block_size),
+               Block(block_size * 18, HEIGHT - block_size * 4, block_size), Block(block_size * 21, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 24, HEIGHT - block_size * 4, block_size),Block(block_size * 27, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 30, HEIGHT - block_size * 6, block_size), Block(block_size * 31, HEIGHT - block_size * 6, block_size),
+               Block(block_size * 32, HEIGHT - block_size * 6, block_size), Spike(block_size*33, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size*33.5, HEIGHT - block_size - 32, 16, 32),Spike(block_size*34, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size*34.5, HEIGHT - block_size - 32, 16, 32), Spike(block_size*35, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size*35.5, HEIGHT - block_size - 32, 16, 32),Spike(block_size*36, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size*36.5, HEIGHT - block_size - 32, 16, 32),Spike(block_size*37, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size*37.5, HEIGHT - block_size - 32, 16, 32),Spike(block_size*38, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size*38.5, HEIGHT - block_size - 32, 16, 32), Spike(block_size*39, HEIGHT - block_size - 32, 16, 32),
                Spike(350, HEIGHT - block_size - 32, 16, 32),Spike(1560, HEIGHT - block_size - 32, 16, 32)]
+
 
     offset_x = 0
     scroll_area_width = 200
