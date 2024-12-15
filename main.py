@@ -539,8 +539,8 @@ def main(window):
                Block(block_size * 285.5, HEIGHT - block_size * 2, block_size), Block(block_size * 286.5, HEIGHT - block_size * 2, block_size),
                Spike(block_size * 282, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 282.5, HEIGHT - block_size*2 - 32, 16, 32),
                Spike(block_size * 283, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 283.5, HEIGHT - block_size*2 - 32, 16, 32),
-               Spike(block_size * 285.5, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 286, HEIGHT - block_size*2 - 32, 16, 32),
-               Spike(block_size * 286.5, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 287, HEIGHT - block_size*2 - 32, 16, 32),
+               Spike(block_size * 285.6, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 286.1, HEIGHT - block_size*2 - 32, 16, 32),
+               Spike(block_size * 286.6, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 287.1, HEIGHT - block_size*2 - 32, 16, 32),
                Spike(350, HEIGHT - block_size - 32, 16, 32),Spike(1560, HEIGHT - block_size - 32, 16, 32),Metalcan(block_size * 6.5, HEIGHT - block_size - 88, 22, 44)]
 
 
