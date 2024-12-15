@@ -9,6 +9,7 @@ Next TO-DOs:
 - keys (separate in 3 diffferent keys)
 - sound effects 
 
+
 '''
 
 # Import necessary libraries -  Remember to check if any of then were forgotten
@@ -417,7 +418,7 @@ def main(window):
     pizza= Pizza(100, HEIGHT - block_size - 68.5,62,38)
 
     floor = [Block(i * block_size, HEIGHT - block_size, block_size)
-             for i in range(-WIDTH // block_size, (WIDTH * 20) // block_size)]
+             for i in range(-WIDTH // block_size, (WIDTH * 29) // block_size)]
     objects = [*floor, Block(-800, HEIGHT - block_size * 2, block_size), Block(-800, HEIGHT - block_size * 3, block_size),
                Block(-800, HEIGHT - block_size * 4, block_size), Block(-800, HEIGHT - block_size * 5, block_size),
                Block(-800, HEIGHT - block_size * 6, block_size), Block(-800, HEIGHT - block_size * 7, block_size),
@@ -483,6 +484,63 @@ def main(window):
                Pizza(block_size * 150, HEIGHT - block_size - 68.5,62,38), Pizza(block_size * 154, HEIGHT - block_size - 68.5,62,38),
                Pizza(block_size * 158, HEIGHT - block_size - 68.5,62,38), Pizza(block_size * 162, HEIGHT - block_size - 68.5,62,38),
                Pizza(block_size * 166, HEIGHT - block_size - 68.5,62,38), Pizza(block_size * 170, HEIGHT - block_size - 68.5,62,38),
+               Block(block_size * 175, HEIGHT - block_size * 4, block_size), Block(block_size * 176, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 177, HEIGHT - block_size * 4, block_size), Mug(block_size * 177, HEIGHT - block_size - 55, 31, 31),
+               Block(block_size * 178, HEIGHT - block_size * 4, block_size),  Block(block_size * 179, HEIGHT - block_size * 4, block_size), 
+               Block(block_size * 180, HEIGHT - block_size * 4, block_size),  Block(block_size * 181, HEIGHT - block_size * 4, block_size), 
+               Mug(block_size * 180, HEIGHT - block_size - 55, 31, 31), Block(block_size * 182, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 183, HEIGHT - block_size * 4, block_size), Block(block_size * 184, HEIGHT - block_size * 5, block_size),
+               Block(block_size * 185, HEIGHT - block_size * 5, block_size), Spike(block_size * 185, HEIGHT - block_size*5 - 32, 16, 32), Spike(block_size * 185.5, HEIGHT - block_size*5 - 32, 16, 32),
+               Block(block_size * 186, HEIGHT - block_size * 6, block_size), Block(block_size * 187, HEIGHT - block_size * 7, block_size),
+               Block(block_size * 188, HEIGHT - block_size * 7, block_size), Spike(block_size * 187.5, HEIGHT - block_size*7 - 32, 16, 32),Spike(block_size * 188, HEIGHT - block_size*7 - 32, 16, 32),
+               Block(block_size * 189, HEIGHT - block_size * 4, block_size), Block(block_size * 191, HEIGHT - block_size * 5, block_size),
+               Big_Plastic(block_size * 193, HEIGHT - block_size - 115, 41, 59),
+               Block(block_size * 196, HEIGHT - block_size * 4, block_size), Block(block_size * 198, HEIGHT - block_size * 5, block_size), 
+               Big_Plastic(block_size * 200, HEIGHT - block_size - 115, 41, 59),
+               Block(block_size * 205, HEIGHT - block_size * 4, block_size), Block(block_size * 207, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 210, HEIGHT - block_size * 5, block_size), Block(block_size * 213, HEIGHT - block_size * 6, block_size),
+               Spike(block_size * 215, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 215.5, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size * 216, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 216.5, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size * 217, HEIGHT - block_size - 32, 16, 32),Spike(block_size * 217.5, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size * 218, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 218.5, HEIGHT - block_size - 32, 16, 32),
+               Block(block_size * 220, HEIGHT - block_size * 4, block_size),Block(block_size * 221, HEIGHT - block_size * 4, block_size),
+               Metalcan(block_size * 222.5, HEIGHT - block_size*4 - 88, 22, 44), Block(block_size * 222, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 223, HEIGHT - block_size * 4, block_size), Block(block_size * 224, HEIGHT - block_size * 4, block_size),
+               Cup(block_size * 226, HEIGHT - block_size - 90, 30, 48),Block(block_size * 230, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 230, HEIGHT - block_size * 7, block_size), Big_Plastic(block_size * 232, HEIGHT - block_size - 115, 41, 59),
+               Block(block_size * 233, HEIGHT - block_size * 4, block_size), Block(block_size * 233, HEIGHT - block_size * 7, block_size), 
+               Big_Plastic(block_size * 235, HEIGHT - block_size - 115, 41, 59), Big_Plastic(block_size * 238, HEIGHT - block_size - 115, 41, 59),
+               Block(block_size * 236, HEIGHT - block_size * 4, block_size), Block(block_size * 236, HEIGHT - block_size * 7, block_size),
+               Block(block_size * 240, HEIGHT - block_size * 2, block_size), Block(block_size * 241, HEIGHT - block_size * 3, block_size),
+               Block(block_size * 242, HEIGHT - block_size * 3, block_size), Block(block_size * 243, HEIGHT - block_size * 3, block_size),
+               Block(block_size * 246, HEIGHT - block_size * 5, block_size), Block(block_size * 244, HEIGHT - block_size * 7, block_size),
+               Block(block_size * 243, HEIGHT - block_size * 7, block_size), Metalcan(block_size * 243, HEIGHT - block_size*7 - 88, 22, 44),
+               Block(block_size * 246.5, HEIGHT - block_size * 8, block_size), Block(block_size * 247.5, HEIGHT - block_size * 8, block_size),
+               Block(block_size * 249.5, HEIGHT - block_size * 6, block_size), Spike(block_size * 247, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size * 247.5, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 248, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size * 248.5, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 249, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size * 249.5, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 250, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size * 250.5, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 251, HEIGHT - block_size - 32, 16, 32),
+               Spike(block_size * 251.5, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 252, HEIGHT - block_size - 32, 16, 32),
+               Block(block_size * 258, HEIGHT - block_size * 4, block_size), Cup(block_size * 258, HEIGHT - block_size - 90, 30, 48),
+               Cup(block_size * 259, HEIGHT - block_size - 90, 30, 48),Cup(block_size * 260, HEIGHT - block_size - 90, 30, 48),
+               Cup(block_size * 261, HEIGHT - block_size - 90, 30, 48), Cup(block_size * 262, HEIGHT - block_size - 90, 30, 48),
+               Cup(block_size * 263, HEIGHT - block_size - 90, 30, 48), Cup(block_size * 264, HEIGHT - block_size - 90, 30, 48),
+               Cup(block_size * 265, HEIGHT - block_size - 90, 30, 48), Cup(block_size * 266, HEIGHT - block_size - 90, 30, 48),
+               Block(block_size * 264.5, HEIGHT - block_size * 5.5, block_size), Block(block_size * 271, HEIGHT - block_size * 5.5, block_size),
+               Block(block_size * 277.5, HEIGHT - block_size * 5.5, block_size), Block(block_size * 279, HEIGHT - block_size * 7.5, block_size),
+               Cup(block_size * 267, HEIGHT - block_size - 90, 30, 48), Cup(block_size * 268, HEIGHT - block_size - 90, 30, 48),
+               Cup(block_size * 269, HEIGHT - block_size - 90, 30, 48), Cup(block_size * 270, HEIGHT - block_size - 90, 30, 48),
+               Cup(block_size * 271, HEIGHT - block_size - 90, 30, 48), Cup(block_size * 272, HEIGHT - block_size - 90, 30, 48),
+               Cup(block_size * 273, HEIGHT - block_size - 90, 30, 48), Cup(block_size * 274, HEIGHT - block_size - 90, 30, 48),
+               Cup(block_size * 275, HEIGHT - block_size - 90, 30, 48), Cup(block_size * 276, HEIGHT - block_size - 90, 30, 48),
+               Cup(block_size * 277, HEIGHT - block_size - 90, 30, 48),Cup(block_size * 278, HEIGHT - block_size - 90, 30, 48),
+               Block(block_size * 282, HEIGHT - block_size * 2, block_size), Block(block_size * 283, HEIGHT - block_size * 2, block_size),
+               Block(block_size * 285.5, HEIGHT - block_size * 2, block_size), Block(block_size * 286.5, HEIGHT - block_size * 2, block_size),
+               Spike(block_size * 282, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 282.5, HEIGHT - block_size*2 - 32, 16, 32),
+               Spike(block_size * 283, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 283.5, HEIGHT - block_size*2 - 32, 16, 32),
+               Spike(block_size * 285.5, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 286, HEIGHT - block_size*2 - 32, 16, 32),
+               Spike(block_size * 286.5, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 287, HEIGHT - block_size*2 - 32, 16, 32),
                Spike(350, HEIGHT - block_size - 32, 16, 32),Spike(1560, HEIGHT - block_size - 32, 16, 32),Metalcan(block_size * 6.5, HEIGHT - block_size - 88, 22, 44)]
 
 
