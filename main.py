@@ -5,9 +5,8 @@ Tag designer creator:
 
 '''
 Next TO-DOs:
-- map 
-- keys (separate in 3 diffferent keys)
-- sound effects 
+- change "hit status" to "collect" status
+- sound effects (Guillermo and Magzahn)
 
 
 '''
@@ -25,7 +24,7 @@ pygame.init()
 pygame.font.init()
 
 # Set up the game window
-pygame.display.set_caption("Forest and Hooves")
+pygame.display.set_caption("Jumpy goat")
 WIDTH, HEIGHT = 1000, 800 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -239,7 +238,6 @@ class Block(Object):
         self.image.blit(block, (0, 0))
         self.mask = pygame.mask.from_surface(self.image)
 
-
 class Spike(Object):
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height, "spike")
@@ -282,14 +280,27 @@ class Pizza(Object):
         self.image = self.pizza["Idle"][0]
         self.mask = pygame.mask.from_surface(self.image)
 
+class Key1(Object):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height, "key1")
+        self.key1 = load_sprite_sheets("Objects", "Keys", width, height)
+        self.image = self.key1["Key1"][0]
+        self.mask = pygame.mask.from_surface(self.image)
 
-# Key class for collectible keys
-class Key(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()  # Initialize the parent class
-        self.image = pygame.image.load(join("assets", "KeyIcons.png")).convert_alpha()  # Load the key image
-        self.image = pygame.transform.scale(self.image, (32, 32))  # Scale the key image
-        self.rect = self.image.get_rect(topleft=(x, y))  # Set the position of the key
+class Key2(Object):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height, "key2")
+        self.key2 = load_sprite_sheets("Objects", "Keys", width, height)
+        self.image = self.key2["Key2"][0]
+        self.mask = pygame.mask.from_surface(self.image)
+
+class Key3(Object):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height, "key3")
+        self.key3 = load_sprite_sheets("Objects", "Keys", width, height)
+        self.image = self.key3["Key3"][0]
+        self.mask = pygame.mask.from_surface(self.image)
+
 
 # Function to draw the win screen
 def draw_win_screen(window):
@@ -298,7 +309,7 @@ def draw_win_screen(window):
     text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))  # Center the text
     window.blit(text, text_rect)  # Draw the text on the window
     pygame.display.update()  # Update the display
-    pygame.time.delay(2000)  # Wait for 2 seconds
+    pygame.time.delay(5000)  # Wait for 5 seconds
 
 def get_background(name):
     """
@@ -400,8 +411,16 @@ def handle_move(player, objects):
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
         if obj and obj.name == "pizza":
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
+    
+    for obj in to_check:
+        if obj and obj.name == "key1":
+            player.make_hit(pygame.time.get_ticks())
+        if obj and obj.name == "key2":
+            player.make_hit(pygame.time.get_ticks())
+        if obj and obj.name == "key3":
+            player.make_hit(pygame.time.get_ticks())
 
-
+''''''
 
 def main(window):
     clock = pygame.time.Clock()
@@ -416,6 +435,9 @@ def main(window):
     cup = Cup(100, HEIGHT - block_size - 90, 30, 48)
     metalcan= Metalcan(100, HEIGHT - block_size - 88, 22, 44)
     pizza= Pizza(100, HEIGHT - block_size - 68.5,62,38)
+    key1= Key1(50, HEIGHT - block_size - 32, 32, 32)
+    key2= Key2(100, HEIGHT - block_size - 32, 32, 32)
+    key3= Key3(150, HEIGHT - block_size - 32, 32, 32)
 
     floor = [Block(i * block_size, HEIGHT - block_size, block_size)
              for i in range(-WIDTH // block_size, (WIDTH * 29) // block_size)]
@@ -453,7 +475,7 @@ def main(window):
                Spike(block_size * 70, HEIGHT - block_size - 32, 16, 32),Spike(block_size * 70.5, HEIGHT - block_size - 32, 16, 32),
                Block(block_size * 72, HEIGHT - block_size * 2, block_size), Block(block_size * 73, HEIGHT - block_size * 3, block_size),
                Block(block_size * 74, HEIGHT - block_size * 4, block_size), Block(block_size * 75, HEIGHT - block_size * 5, block_size),
-               Block(block_size * 76, HEIGHT - block_size * 6, block_size), Block(block_size * 77, HEIGHT - block_size * 5, block_size),
+               Block(block_size * 76, HEIGHT - block_size * 6, block_size), Block(block_size * 77, HEIGHT - block_size * 5, block_size), Key1(block_size * 76, HEIGHT - block_size -64, 32, 32),
                Block(block_size * 78, HEIGHT - block_size * 4, block_size), Metalcan(block_size * 75.5, HEIGHT - block_size*5 - 88, 22, 44),
                Spike(block_size * 78, HEIGHT - block_size*4 -32 , 16, 32), Spike(block_size * 78.5, HEIGHT - block_size*4 - 32, 16, 32),
                Spike(block_size * 80.5, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 81, HEIGHT - block_size - 32, 16, 32),
@@ -471,7 +493,7 @@ def main(window):
                Block(block_size * 111, HEIGHT - block_size * 6, block_size), Block(block_size * 112, HEIGHT - block_size * 6, block_size),
                Block(block_size * 113, HEIGHT - block_size * 6, block_size),Block(block_size * 113, HEIGHT - block_size * 7, block_size),
                Block(block_size * 113, HEIGHT - block_size * 8, block_size),Block(block_size * 113, HEIGHT - block_size * 9, block_size),
-               Block(block_size * 113, HEIGHT - block_size * 10, block_size),
+               Block(block_size * 113, HEIGHT - block_size * 10, block_size), Key2(block_size * 112, HEIGHT - block_size*6 - 64, 32, 32),
                Block(block_size * 96, HEIGHT - block_size * 4, block_size), Block(block_size * 122, HEIGHT - block_size * 4, block_size),
                Block(block_size * 123, HEIGHT - block_size * 4, block_size), Block(block_size * 124, HEIGHT - block_size * 4, block_size),
                Block(block_size * 125, HEIGHT - block_size * 4, block_size), Block(block_size * 126, HEIGHT - block_size * 4, block_size),
@@ -516,7 +538,7 @@ def main(window):
                Block(block_size * 246, HEIGHT - block_size * 5, block_size), Block(block_size * 244, HEIGHT - block_size * 7, block_size),
                Block(block_size * 243, HEIGHT - block_size * 7, block_size), Metalcan(block_size * 243, HEIGHT - block_size*7 - 88, 22, 44),
                Block(block_size * 246.5, HEIGHT - block_size * 8, block_size), Block(block_size * 247.5, HEIGHT - block_size * 8, block_size),
-               Block(block_size * 249.5, HEIGHT - block_size * 6, block_size), Spike(block_size * 247, HEIGHT - block_size - 32, 16, 32),
+                Block(block_size * 248.5, HEIGHT - block_size * 6, block_size), Spike(block_size * 247, HEIGHT - block_size - 32, 16, 32),
                Spike(block_size * 247.5, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 248, HEIGHT - block_size - 32, 16, 32),
                Spike(block_size * 248.5, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 249, HEIGHT - block_size - 32, 16, 32),
                Spike(block_size * 249.5, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 250, HEIGHT - block_size - 32, 16, 32),
@@ -537,6 +559,7 @@ def main(window):
                Cup(block_size * 277, HEIGHT - block_size - 90, 30, 48),Cup(block_size * 278, HEIGHT - block_size - 90, 30, 48),
                Block(block_size * 282, HEIGHT - block_size * 2, block_size), Block(block_size * 283, HEIGHT - block_size * 2, block_size),
                Block(block_size * 285.5, HEIGHT - block_size * 2, block_size), Block(block_size * 286.5, HEIGHT - block_size * 2, block_size),
+               Key3(block_size * 284, HEIGHT - block_size - 64, 32, 32),
                Spike(block_size * 282, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 282.5, HEIGHT - block_size*2 - 32, 16, 32),
                Spike(block_size * 283, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 283.5, HEIGHT - block_size*2 - 32, 16, 32),
                Spike(block_size * 285.6, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 286.1, HEIGHT - block_size*2 - 32, 16, 32),
