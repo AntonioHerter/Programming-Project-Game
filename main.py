@@ -5,7 +5,7 @@ Tag designer creator:
 
 '''
 Next TO-DOs:
-- change "hit status" to "collect" status
+- collect/delet key after being collected 
 - sound effects (Guillermo and Magzahn)
 
 
@@ -502,8 +502,8 @@ def main(window):
                Block(block_size * 85.5, HEIGHT - block_size * 4, block_size), 
                Big_Plastic(block_size * 85.5, HEIGHT - block_size - 115, 41, 59), Metalcan(block_size * 88.5, HEIGHT - block_size - 88, 22, 44),
                Block(block_size * 90, HEIGHT - block_size * 5, block_size), Block(block_size * 92, HEIGHT - block_size * 6, block_size),
-               Block(block_size * 98, HEIGHT - block_size * 5, block_size), Block(block_size * 99, HEIGHT - block_size * 4, block_size),
-               Block(block_size * 100, HEIGHT - block_size * 5, block_size), Block(block_size * 101, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 98, HEIGHT - block_size * 5, block_size), Block(block_size * 99, HEIGHT - block_size * 5, block_size),
+               Block(block_size * 100, HEIGHT - block_size * 5, block_size), Block(block_size * 101, HEIGHT - block_size * 5, block_size),
                Block(block_size * 102, HEIGHT - block_size * 5, block_size), Block(block_size * 103, HEIGHT - block_size * 4, block_size),
                Spike(block_size * 103, HEIGHT - block_size*4 - 32, 16, 32), Spike(block_size * 103.5, HEIGHT - block_size*4 - 32, 16, 32),
                Block(block_size * 105, HEIGHT - block_size * 7, block_size), Block(block_size * 106, HEIGHT - block_size * 6, block_size),
