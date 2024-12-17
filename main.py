@@ -126,6 +126,8 @@ class Player(pygame.sprite.Sprite):
         self.initial_position = (x, y)  # Store the initial position
         self.hit_animation_duration = 30  # Duration of hit animation frames
         self.hit_animation_count = 0  # Counter for hit animation frames
+        self.points = 0  # Initialize points to 0
+        self.collected_keys = set()  # Set to track collected keys
 
     def jump(self): #Makes the player jump
         self.y_vel = -self.GRAVITY * 7
@@ -144,6 +146,12 @@ class Player(pygame.sprite.Sprite):
         self.rect.x += dx # Update x-position
         self.rect.y += dy # Update y-position
 
+    def points_count(self, key_name):
+        if key_name not in self.collected_keys:  # Check if the key has not been collected
+            self.collected_keys.add(key_name)  # Add the key to the collected set
+            self.points += 1  # Increment points
+            print(f"Keys collected: {self.points}")  # Print the current points (for debugging)
+
     def make_hit(self, current_time):
         if current_time - self.last_hit_time >= 500:  # 0.5 seconds interval
             self.hit = True
@@ -155,6 +163,8 @@ class Player(pygame.sprite.Sprite):
         self.y_vel = 0  # Reset vertical velocity
         self.hit_count = 0  # Reset hit count
         self.hit = False  # Reset hit state
+        self.points = 0  # Reset points
+        self.collected_keys = set()  # Reset collected keys
         return self.initial_position[0]  # Return the x position for resetting the view
 
     def move_left(self, vel): # Moves the player left. Args: vel (int): Speed of movement.
@@ -309,7 +319,7 @@ def draw_win_screen(window):
     text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))  # Center the text
     window.blit(text, text_rect)  # Draw the text on the window
     pygame.display.update()  # Update the display
-    pygame.time.delay(5000)  # Wait for 5 seconds
+    pygame.time.delay(20000)  # Wait for 20 seconds
 
 def get_background(name):
     """
@@ -411,16 +421,25 @@ def handle_move(player, objects):
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
         if obj and obj.name == "pizza":
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
-    
+
+        for obj in to_check:
+            if obj and obj.name in ["key1", "key2", "key3"]:
+                player.points_count(obj.name)  # Pass the key name
+                obj.kill()  # Remove the key from the game
+
+    '''
+    early code version
     for obj in to_check:
         if obj and obj.name == "key1":
-            player.make_hit(pygame.time.get_ticks())
+            player.points_count("key1")  # Pass the key name
+            obj.kill()  # Remove the key from the game
         if obj and obj.name == "key2":
-            player.make_hit(pygame.time.get_ticks())
+            player.points_count("key2")  # Pass the key name
+            obj.kill()  # Remove the key from the game
         if obj and obj.name == "key3":
-            player.make_hit(pygame.time.get_ticks())
-
-''''''
+            player.points_count("key3")  # Pass the key name
+            obj.kill()  # Remove the key from the game
+'''
 
 def main(window):
     clock = pygame.time.Clock()
@@ -559,7 +578,7 @@ def main(window):
                Cup(block_size * 277, HEIGHT - block_size - 90, 30, 48),Cup(block_size * 278, HEIGHT - block_size - 90, 30, 48),
                Block(block_size * 282, HEIGHT - block_size * 2, block_size), Block(block_size * 283, HEIGHT - block_size * 2, block_size),
                Block(block_size * 285.5, HEIGHT - block_size * 2, block_size), Block(block_size * 286.5, HEIGHT - block_size * 2, block_size),
-               Key3(block_size * 284, HEIGHT - block_size - 64, 32, 32),
+               Key3(block_size * 284.5, HEIGHT - block_size - 64, 32, 32),
                Spike(block_size * 282, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 282.5, HEIGHT - block_size*2 - 32, 16, 32),
                Spike(block_size * 283, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 283.5, HEIGHT - block_size*2 - 32, 16, 32),
                Spike(block_size * 285.6, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 286.1, HEIGHT - block_size*2 - 32, 16, 32),
@@ -588,13 +607,29 @@ def main(window):
         handle_move(player, objects)
         draw(window, background, bg_image, player, objects, offset_x)
 
+        if player.points >= 3:  # Assuming there are 3 keys
+            draw_win_screen(window)  # Call the win screen function
+            run = False  # End the game loop
+
         # Check if the player has fallen below the floor
         if player.rect.y > y_floor:
             offset_x = player.reset_position()  # Reset player position and update offset_x
+             # Recreate keys when the player resets
+            key1 =Key1(block_size * 76, HEIGHT - block_size -64, 32, 32)
+            key2 = Key2(block_size * 112, HEIGHT - block_size*6 - 64, 32, 32)
+            key3 = Key3(block_size * 284, HEIGHT - block_size - 64, 32, 32)
+            objects = [obj for obj in objects if obj.name not in ["key1", "key2", "key3"]]  # Remove old keys
+            objects.extend([key1, key2, key3])  # Add keys back to the objects list
 
         # Check if the player has been hit 3 times
         if player.hit_count >= 3:
             offset_x = player.reset_position()  # Reset player position and update offset_x
+             # Recreate keys when the player resets
+            key1 =Key1(block_size * 76, HEIGHT - block_size -64, 32, 32)
+            key2 = Key2(block_size * 112, HEIGHT - block_size*6 - 64, 32, 32)
+            key3 = Key3(block_size * 284.5, HEIGHT - block_size - 64, 32, 32)
+            objects = [obj for obj in objects if obj.name not in ["key1", "key2", "key3"]]  # Remove old keys
+            objects.extend([key1, key2, key3])  # Add keys back to the objects list
 
         if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
                 (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
