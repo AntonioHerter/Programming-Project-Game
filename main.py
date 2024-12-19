@@ -1,5 +1,4 @@
-'''Due to problems while coding I am recreating the main menu which was before and adding comments new things to implement
-
+'''
 Tag designer creator:
 '''
 
@@ -176,26 +175,26 @@ class Player(pygame.sprite.Sprite):
             self.direction = "right"
             self.animation_count = 0
 
-    def loop(self, fps):
-        self.y_vel += min(1, (self.fall_count / fps) * self.GRAVITY)
-        self.move(self.x_vel, self.y_vel)
+    def loop(self, fps): # Update the vertical velocity (y_vel) based on gravity and fall count.
+        self.y_vel += min(1, (self.fall_count / fps) * self.GRAVITY) # The fall speed increases gradually, capped at a maximum of 1.
+        self.move(self.x_vel, self.y_vel) # Move the player by the current horizontal (x_vel) and vertical (y_vel) velocities.
 
-        if self.hit:
-            self.hit_animation_count += 1
-            if self.hit_animation_count >= self.hit_animation_duration:
-                self.hit = False  # Reset hit state after animation
+        if self.hit: # Check if the player is currently in a hit state (e.g., has been damaged).
+            self.hit_animation_count += 1 # Increment the hit animation counter to track how long the player has been hit.
+            if self.hit_animation_count >= self.hit_animation_duration: # Check if the hit animation has reached its duration limit.
+                self.hit = False  # Reset the hit state to false, indicating the player is no longer hit.
                 self.hit_animation_count = 0  # Reset animation counter
-        self.fall_count += 1
-        self.update_sprite()
+        self.fall_count += 1 # Increment the fall count to track how long the player has been falling.
+        self.update_sprite() # Update the player's sprite based on the current state (e.g., running, jumping, falling).
 
     def landed(self): # Resets jump and fall counters when the player lands.
-        self.fall_count = 0
-        self.y_vel = 0
-        self.jump_count = 0
+        self.fall_count = 0 # Reset the fall count to 0, indicating that the player is no longer falling.
+        self.y_vel = 0 # Set the vertical velocity (y_vel) to 0, stopping any downward movement.
+        self.jump_count = 0 # Reset the jump count to 0, indicating that the player is no longer in a jump state.
 
     def hit_head(self):
-        self.count = 0
-        self.y_vel *= -1
+        self.count = 0 # Reset the count variable to 0. This could be used for tracking purposes, such as how many times the player has hit their head or for other game logic.
+        self.y_vel *= -1 #Invert the vertical velocity (y_vel) to make the player bounce upwards. This simulates the effect of hitting a ceiling, causing the player to move in the opposite direction (upward).
 
     def update_sprite(self): #Updates the player's sprite based on the current direction and animation state.
         sprite_sheet = "idle"
@@ -211,32 +210,37 @@ class Player(pygame.sprite.Sprite):
         elif self.x_vel != 0:
             sprite_sheet = "run"
 
-        sprite_sheet_name = sprite_sheet + "_" + self.direction
-        sprites = self.SPRITES[sprite_sheet_name]
-        sprite_index = (self.animation_count // self.animation_frame_delay) % len(sprites)
-        self.sprite = sprites[sprite_index]
-        self.animation_count += 1
-        self.update()
+        sprite_sheet_name = sprite_sheet + "_" + self.direction # Construct the full sprite sheet name based on the current sprite sheet and direction.
+        sprites = self.SPRITES[sprite_sheet_name] # Retrieve the list of sprites from the SPRITES dictionary using the constructed name.
+        sprite_index = (self.animation_count // self.animation_frame_delay) % len(sprites) # Calculate the current sprite index based on the animation count and frame delay.
+        self.sprite = sprites[sprite_index] # Update the current sprite to the one at the calculated index.
+        self.animation_count += 1 # Increment the animation count to progress the animation.
+        self.update() # Call the update method to refresh the player's rectangle and mask.
 
     def update(self):
-        self.rect = self.sprite.get_rect(topleft=(self.rect.x, self.rect.y))
-        self.mask = pygame.mask.from_surface(self.sprite)
+        self.rect = self.sprite.get_rect(topleft=(self.rect.x, self.rect.y)) # Update the player's rectangle to match the current sprite's position.
+        self.mask = pygame.mask.from_surface(self.sprite) # Create a mask from the current sprite for collision detection.
 
     def draw(self, win, scroll_offset): #Draws the player on the screen. Args: win (pygame.Surface): The game window.
         win.blit(self.sprite, (self.rect.x - scroll_offset, self.rect.y)) # Draw the player sprite
 
 
 class Object(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height, name=None):
-        super().__init__()
-        self.rect = pygame.Rect(x, y, width, height)
-        self.image = pygame.Surface((width, height), pygame.SRCALPHA)
-        self.width = width
-        self.height = height
-        self.name = name
+    def __init__(self, x, y, width, height, name=None): # Initialize the object with its position, dimensions, and optional name.
+        super().__init__() # Call the parent class (Sprite) constructor to initialize the sprite. 
+        self.rect = pygame.Rect(x, y, width, height) # Create a rectangle (rect) to represent the object's position and size.
+        self.image = pygame.Surface((width, height), pygame.SRCALPHA) # Create a surface (image) for the object with the specified width and height. The surface is created with an alpha channel (transparency) enabled.
+        self.width = width # Store the width of the object for future reference.
+        self.height = height  #Store the height of the object for future reference.
+        self.name = name # Store the optional name of the object, which can be used for identification.
 
     def draw(self, win, scroll_offset):
         win.blit(self.image, (self.rect.x - scroll_offset, self.rect.y))
+        # Draw the object on the given window (win) at its current position,
+        # adjusting for any scrolling offset.
+        
+        # Blit (draw) the object's image onto the window at the position of the rectangle,
+        # subtracting the scroll offset to account for camera movement.
 
 
 class Block(Object):
@@ -362,50 +366,54 @@ def draw(window, background, bg_image, player, objects, scroll_offset):
 
 
 def handle_vertical_collision(player, objects, dy):
-    collided_objects = []
-    for obj in objects:
-        if pygame.sprite.collide_mask(player, obj):
-            if dy > 0:
+    collided_objects = [] # List to keep track of objects the player collides with. 
+    for obj in objects: # Check if the player collides with the object using a pixel-perfect mask collision.
+        if pygame.sprite.collide_mask(player, obj): 
+            if dy > 0: # If the player is moving downwards. Position the player's bottom at the top of the object (land on it).
                 player.rect.bottom = obj.rect.top
-                player.landed()
-            elif dy < 0:
+                player.landed() # Call the landed method to reset jump and fall states.
+            elif dy < 0: # If the player is moving upwards. Position the player's top at the bottom of the object (hit their head).
                 player.rect.top = obj.rect.bottom
-                player.hit_head()
+                player.hit_head()  # Call the hit_head method to handle head collision. 
 
-            collided_objects.append(obj)
+            collided_objects.append(obj) # Add the collided object to the list.
 
-    return collided_objects
+    return collided_objects # Return the list of collided objects.
 
 
-def collide(player, objects, dx):
-    player.move(dx, 0)
-    player.update()
-    collided_object = None
-    for obj in objects:
-        if pygame.sprite.collide_mask(player, obj):
-            collided_object = obj
-            break
+def collide(player, objects, dx): # Handles horizontal collisions between the player and a list of objects. 
+    player.move(dx, 0) # Move the player horizontally by dx.
+    player.update() 
+    collided_object = None # Initialize a variable to store the first collided object.
+    for obj in objects: # Iterate through each object in the list. Check if the player collides with the object using a pixel-perfect mask collision.
+        if pygame.sprite.collide_mask(player, obj): 
+            collided_object = obj  # Store the collided object.
+            break # Exit the loop after the first collision is found.
 
-    player.move(-dx, 0)
-    player.update()
-    return collided_object
+    player.move(-dx, 0) # Move the player back to the original position.
+    player.update() # Update the player's state after moving back.
+    return collided_object # Return the first collided object, if any.
 
 
 def handle_move(player, objects):
-    keys = pygame.key.get_pressed()
+    keys = pygame.key.get_pressed() # Get the current state of all keyboard keys.
 
-    player.x_vel = 0
-    collide_left = collide(player, objects, -player_vel * 6)
-    collide_right = collide(player, objects, player_vel * 6)
+    player.x_vel = 0 # Reset the player's horizontal velocity.
+    # Check for collisions when moving left and right.
+    collide_left = collide(player, objects, -player_vel * 6) # Check for left collisions.
+    collide_right = collide(player, objects, player_vel * 6) # Check for right collisions.
 
+    # Move the player left if the left key is pressed and there is no left collision.
     if keys[pygame.K_LEFT] and not collide_left:
         player.move_left(player_vel)
+    # Move the player right if the right key is pressed and there is no right collision.
     if keys[pygame.K_RIGHT] and not collide_right:
         player.move_right(player_vel)
 
-    vertical_collide = handle_vertical_collision(player, objects, player.y_vel)
-    to_check = [collide_left, collide_right, *vertical_collide]
+    vertical_collide = handle_vertical_collision(player, objects, player.y_vel) # Handle vertical collisions based on the player's vertical velocity.
+    to_check = [collide_left, collide_right, *vertical_collide] # Create a list of objects to check for interactions (collisions).
 
+    # Check for interactions with specific objects (e.g., spikes, keys).
     for obj in to_check:
         if obj and obj.name == "spike":
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
@@ -419,7 +427,8 @@ def handle_move(player, objects):
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
         if obj and obj.name == "pizza":
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
-        
+            
+    # Check for key collection and remove keys from the game.
     for obj in to_check:
         if obj and obj.name == "key1":
             player.points_count("key1")  # Pass the key name
