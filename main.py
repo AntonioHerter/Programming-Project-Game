@@ -7,8 +7,6 @@ Tag designer creator:
 Next TO-DOs:
 - collect/delet key after being collected 
 - sound effects (Guillermo and Magzahn)
-
-
 '''
 
 # Import necessary libraries -  Remember to check if any of then were forgotten
@@ -30,7 +28,7 @@ window = pygame.display.set_mode((WIDTH, HEIGHT))
 
 # Game constants for smooth gameplay
 FPS = 60  # Frames per second, controls the speed of the game loop
-PLAYER_VEL = 7  # Speed of the player’s movement
+player_vel = 7  # Speed of the player’s movement
 
 #   Function to flip sprites horizontally 
 def flip(sprites):
@@ -97,10 +95,10 @@ def get_block(size):
 
 # Class to control the Player
 class Player(pygame.sprite.Sprite):
-    COLOR = (255, 0, 0)
+    player_color = (255, 0, 0)
     GRAVITY = 1.8 # Gravity constant to pull the player down
     SPRITES = load_sprite_sheets("MainCharac", "WhiteG", 72, 72, True) # Load player sprites
-    ANIMATION_DELAY = 2 # How quickly the animations change frames
+    animation_frame_delay = 2 # How quickly the animations change frames
 
     def __init__(self, x, y, width, height):
         """
@@ -127,7 +125,7 @@ class Player(pygame.sprite.Sprite):
         self.hit_animation_duration = 30  # Duration of hit animation frames
         self.hit_animation_count = 0  # Counter for hit animation frames
         self.points = 0  # Initialize points to 0
-        self.collected_keys = set()  # Set to track collected keys
+        self.collected_key_set = set()  # Set to track collected keys
 
     def jump(self): #Makes the player jump
         self.y_vel = -self.GRAVITY * 7
@@ -147,8 +145,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += dy # Update y-position
 
     def points_count(self, key_name):
-        if key_name not in self.collected_keys:  # Check if the key has not been collected
-            self.collected_keys.add(key_name)  # Add the key to the collected set
+        if key_name not in self.collected_key_set:  # Check if the key has not been collected
+            self.collected_key_set.add(key_name)  # Add the key to the collected set
             self.points += 1  # Increment points
             print(f"Keys collected: {self.points}")  # Print the current points (for debugging)
 
@@ -164,7 +162,7 @@ class Player(pygame.sprite.Sprite):
         self.hit_count = 0  # Reset hit count
         self.hit = False  # Reset hit state
         self.points = 0  # Reset points
-        self.collected_keys = set()  # Reset collected keys
+        self.collected_key_set = set()  # Reset collected keys
         return self.initial_position[0]  # Return the x position for resetting the view
 
     def move_left(self, vel): # Moves the player left. Args: vel (int): Speed of movement.
@@ -215,7 +213,7 @@ class Player(pygame.sprite.Sprite):
 
         sprite_sheet_name = sprite_sheet + "_" + self.direction
         sprites = self.SPRITES[sprite_sheet_name]
-        sprite_index = (self.animation_count // self.ANIMATION_DELAY) % len(sprites)
+        sprite_index = (self.animation_count // self.animation_frame_delay) % len(sprites)
         self.sprite = sprites[sprite_index]
         self.animation_count += 1
         self.update()
@@ -224,8 +222,8 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.sprite.get_rect(topleft=(self.rect.x, self.rect.y))
         self.mask = pygame.mask.from_surface(self.sprite)
 
-    def draw(self, win, offset_x): #Draws the player on the screen. Args: win (pygame.Surface): The game window.
-        win.blit(self.sprite, (self.rect.x - offset_x, self.rect.y)) # Draw the player sprite
+    def draw(self, win, scroll_offset): #Draws the player on the screen. Args: win (pygame.Surface): The game window.
+        win.blit(self.sprite, (self.rect.x - scroll_offset, self.rect.y)) # Draw the player sprite
 
 
 class Object(pygame.sprite.Sprite):
@@ -237,14 +235,14 @@ class Object(pygame.sprite.Sprite):
         self.height = height
         self.name = name
 
-    def draw(self, win, offset_x):
-        win.blit(self.image, (self.rect.x - offset_x, self.rect.y))
+    def draw(self, win, scroll_offset):
+        win.blit(self.image, (self.rect.x - scroll_offset, self.rect.y))
 
 
 class Block(Object):
-    def __init__(self, x, y, size):
-        super().__init__(x, y, size, size)
-        block = get_block(size)
+    def __init__(self, x, y, block_size):
+        super().__init__(x, y, block_size, block_size)
+        block = get_block(block_size)
         self.image.blit(block, (0, 0))
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -315,9 +313,9 @@ class Key3(Object):
 # Function to draw the win screen
 def draw_win_screen(window):
     font = pygame.font.Font(None, 74)  # Create a font object
-    text = font.render("YOU WON", True, (255, 255, 255))  # Render the win text
-    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))  # Center the text
-    window.blit(text, text_rect)  # Draw the text on the window
+    victory_message = font.render("YOU WON!", True, (10, 112, 21))  # Render the win text
+    victory_text_rect = victory_message.get_rect(center=(WIDTH // 2, HEIGHT // 2))  # Center the text
+    window.blit(victory_message, victory_text_rect)  # Draw the text on the window
     pygame.display.update()  # Update the display
     pygame.time.delay(20000)  # Wait for 20 seconds
 
@@ -342,7 +340,7 @@ def get_background(name):
     return tiles, image  # Return positions and image
 
 #Main drawing function 
-def draw(window, background, bg_image, player, objects, offset_x):
+def draw(window, background, bg_image, player, objects, scroll_offset):
     """
     Draws all game elements on the screen.
     Args:
@@ -350,15 +348,15 @@ def draw(window, background, bg_image, player, objects, offset_x):
         background (list): Tiled background positions.
         bg_image (pygame.Surface): Background image.
         player (Player): Player object.
-        offset_x (int): Scrolling offset.
+        scroll_offset(int): Scrolling offset.
     """
     for tile in background: # Loop through all background tiles
         window.blit(bg_image, tile) # Draw each tile at its position
 
     for obj in objects:
-        obj.draw(window, offset_x)
+        obj.draw(window, scroll_offset)
 
-    player.draw(window, offset_x)  # Draw the player
+    player.draw(window, scroll_offset)  # Draw the player
 
     pygame.display.update()# Update the display
 
@@ -397,13 +395,13 @@ def handle_move(player, objects):
     keys = pygame.key.get_pressed()
 
     player.x_vel = 0
-    collide_left = collide(player, objects, -PLAYER_VEL * 6)
-    collide_right = collide(player, objects, PLAYER_VEL * 6)
+    collide_left = collide(player, objects, -player_vel * 6)
+    collide_right = collide(player, objects, player_vel * 6)
 
     if keys[pygame.K_LEFT] and not collide_left:
-        player.move_left(PLAYER_VEL)
+        player.move_left(player_vel)
     if keys[pygame.K_RIGHT] and not collide_right:
-        player.move_right(PLAYER_VEL)
+        player.move_right(player_vel)
 
     vertical_collide = handle_vertical_collision(player, objects, player.y_vel)
     to_check = [collide_left, collide_right, *vertical_collide]
@@ -412,7 +410,7 @@ def handle_move(player, objects):
         if obj and obj.name == "spike":
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
         if obj and obj.name == "bigplastic":
-            player.make_hit(pygame.time.get_ticks())  # Call make_hit with current 
+            player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
         if obj and obj.name == "cup":
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
         if obj and obj.name == "metalcan":
@@ -421,14 +419,7 @@ def handle_move(player, objects):
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
         if obj and obj.name == "pizza":
             player.make_hit(pygame.time.get_ticks())  # Call make_hit with current time
-
-        for obj in to_check:
-            if obj and obj.name in ["key1", "key2", "key3"]:
-                player.points_count(obj.name)  # Pass the key name
-                obj.kill()  # Remove the key from the game
-
-    '''
-    early code version
+        
     for obj in to_check:
         if obj and obj.name == "key1":
             player.points_count("key1")  # Pass the key name
@@ -439,11 +430,10 @@ def handle_move(player, objects):
         if obj and obj.name == "key3":
             player.points_count("key3")  # Pass the key name
             obj.kill()  # Remove the key from the game
-'''
 
 def main(window):
-    clock = pygame.time.Clock()
-    background, bg_image = get_background("green.png")
+    game_clock= pygame.time.Clock()
+    background_tiles, bg_image = get_background("green.png")
 
     block_size = 100
 
@@ -538,7 +528,7 @@ def main(window):
                Big_Plastic(block_size * 193, HEIGHT - block_size - 115, 41, 59),
                Block(block_size * 196, HEIGHT - block_size * 4, block_size), Block(block_size * 198, HEIGHT - block_size * 5, block_size), 
                Big_Plastic(block_size * 200, HEIGHT - block_size - 115, 41, 59),
-               Block(block_size * 205, HEIGHT - block_size * 4, block_size), Block(block_size * 207, HEIGHT - block_size * 4, block_size),
+               Block(block_size * 204, HEIGHT - block_size * 4, block_size), Block(block_size * 207, HEIGHT - block_size * 4, block_size),
                Block(block_size * 210, HEIGHT - block_size * 5, block_size), Block(block_size * 213, HEIGHT - block_size * 6, block_size),
                Spike(block_size * 215, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 215.5, HEIGHT - block_size - 32, 16, 32),
                Spike(block_size * 216, HEIGHT - block_size - 32, 16, 32), Spike(block_size * 216.5, HEIGHT - block_size - 32, 16, 32),
@@ -585,14 +575,13 @@ def main(window):
                Spike(block_size * 286.6, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 287.1, HEIGHT - block_size*2 - 32, 16, 32),
                Spike(350, HEIGHT - block_size - 32, 16, 32),Spike(1560, HEIGHT - block_size - 32, 16, 32),Metalcan(block_size * 6.5, HEIGHT - block_size - 88, 22, 44)]
 
-
-    offset_x = 0
-    scroll_area_width = 200
-    y_floor = HEIGHT  # Define the floor level
+    scroll_offset = 0
+    scroll_area_width = 300
+    floor_level = HEIGHT  # Define the floor level
 
     run = True
     while run:
-        clock.tick(FPS)
+        game_clock.tick(FPS)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -605,15 +594,15 @@ def main(window):
 
         player.loop(FPS)
         handle_move(player, objects)
-        draw(window, background, bg_image, player, objects, offset_x)
+        draw(window, background_tiles, bg_image, player, objects, scroll_offset)
 
         if player.points >= 3:  # Assuming there are 3 keys
             draw_win_screen(window)  # Call the win screen function
             run = False  # End the game loop
 
         # Check if the player has fallen below the floor
-        if player.rect.y > y_floor:
-            offset_x = player.reset_position()  # Reset player position and update offset_x
+        if player.rect.y > floor_level:
+            scroll_offset = player.reset_position()  # Reset player position and update scroll_offset
              # Recreate keys when the player resets
             key1 =Key1(block_size * 76, HEIGHT - block_size -64, 32, 32)
             key2 = Key2(block_size * 112, HEIGHT - block_size*6 - 64, 32, 32)
@@ -623,7 +612,7 @@ def main(window):
 
         # Check if the player has been hit 3 times
         if player.hit_count >= 3:
-            offset_x = player.reset_position()  # Reset player position and update offset_x
+            scroll_offset = player.reset_position()  # Reset player position and update scroll_offset
              # Recreate keys when the player resets
             key1 =Key1(block_size * 76, HEIGHT - block_size -64, 32, 32)
             key2 = Key2(block_size * 112, HEIGHT - block_size*6 - 64, 32, 32)
@@ -631,9 +620,9 @@ def main(window):
             objects = [obj for obj in objects if obj.name not in ["key1", "key2", "key3"]]  # Remove old keys
             objects.extend([key1, key2, key3])  # Add keys back to the objects list
 
-        if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
-                (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
-            offset_x += player.x_vel
+        if ((player.rect.right - scroll_offset >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
+                (player.rect.left - scroll_offset <= scroll_area_width) and player.x_vel < 0):
+            scroll_offset += player.x_vel
 
     pygame.quit()
     quit()
