@@ -5,7 +5,12 @@ Tag designer creator:
 '''
 Next TO-DOs:
 - collect/delet key after being collected 
-- sound effects (Guillermo and Magzahn)
+- sound effects:
+Background check
+jump
+hit
+point count
+restart
 '''
 
 # Import necessary libraries -  Remember to check if any of then were forgotten
@@ -443,6 +448,11 @@ def handle_move(player, objects):
 def main(window):
     game_clock= pygame.time.Clock()
     background_tiles, bg_image = get_background("green.png")
+
+    pygame.mixer.music.load("GAME PROJECT/Sounds/Background.mp3")
+    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.play(-1,0.0)
+
 
     block_size = 100
 
