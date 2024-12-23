@@ -4,13 +4,9 @@ Tag designer creator:
 
 '''
 Next TO-DOs:
-- collect/delet key after being collected 
-- sound effects:
-Background check
-jump
-hit
-point count
-restart
+-delete evrything with "GAME PROJECT" (photos)
+-review comments
+-citations
 '''
 
 # Import necessary libraries -  Remember to check if any of then were forgotten
@@ -390,23 +386,25 @@ def collide(player, objects, dx): # Handles horizontal collisions between the pl
     player.move(dx, 0) # Move the player horizontally by dx.
     player.update() 
     collided_object = None # Initialize a variable to store the first collided object.
-    for obj in objects: # Iterate through each object in the list. Check if the player collides with the object using a pixel-perfect mask collision.
-        if pygame.sprite.collide_mask(player, obj): 
-            collided_object = obj  # Store the collided object.
+    object_index = None 
+    for obj in range(len(objects)): # Iterate through each object in the list. Check if the player collides with the object using a pixel-perfect mask collision.
+        if pygame.sprite.collide_mask(player, objects[obj]): 
+            collided_object = objects[obj]  # Store the collided object.
+            object_index = obj
             break # Exit the loop after the first collision is found.
 
     player.move(-dx, 0) # Move the player back to the original position.
     player.update() # Update the player's state after moving back.
-    return collided_object # Return the first collided object, if any.
+    return [collided_object, object_index] # Return the first collided object, if any.
 
 
 def handle_move(player, objects):
     keys = pygame.key.get_pressed() # Get the current state of all keyboard keys.
-
+    new_objects_list = objects
     player.x_vel = 0 # Reset the player's horizontal velocity.
     # Check for collisions when moving left and right.
-    collide_left = collide(player, objects, -player_vel * 6) # Check for left collisions.
-    collide_right = collide(player, objects, player_vel * 6) # Check for right collisions.
+    collide_left, object_left_index = collide(player, objects, -player_vel * 6) # Check for left collisions.
+    collide_right, object_right_index = collide(player, objects, player_vel * 6) # Check for right collisions.
 
     # Move the player left if the left key is pressed and there is no left collision.
     if keys[pygame.K_LEFT] and not collide_left:
@@ -436,14 +434,28 @@ def handle_move(player, objects):
     # Check for key collection and remove keys from the game.
     for obj in to_check:
         if obj and obj.name == "key1":
+            if (object_right_index != None):
+                new_objects_list.pop(object_right_index)
+            if (object_left_index != None):
+                new_objects_list.pop(object_left_index)
             player.points_count("key1")  # Pass the key name
             obj.kill()  # Remove the key from the game
         if obj and obj.name == "key2":
+            if (object_right_index != None):
+                new_objects_list.pop(object_right_index)
+            if (object_left_index != None):
+                new_objects_list.pop(object_left_index)
             player.points_count("key2")  # Pass the key name
             obj.kill()  # Remove the key from the game
         if obj and obj.name == "key3":
+            if (object_right_index != None):
+                new_objects_list.pop(object_right_index)
+            if (object_left_index != None):
+                new_objects_list.pop(object_left_index)
             player.points_count("key3")  # Pass the key name
             obj.kill()  # Remove the key from the game
+    return new_objects_list
+
 
 def main(window):
     game_clock= pygame.time.Clock()
@@ -457,12 +469,12 @@ def main(window):
     block_size = 100
 
     player = Player(100, 100, 50, 50)
-    spike = Spike(100, HEIGHT - block_size - 32, 16, 32)
-    bigplastic = Big_Plastic(100, HEIGHT - block_size - 115, 41, 59)
-    mug = Mug(100, HEIGHT - block_size - 55, 31, 31)
-    cup = Cup(100, HEIGHT - block_size - 90, 30, 48)
-    metalcan= Metalcan(100, HEIGHT - block_size - 88, 22, 44)
-    pizza= Pizza(100, HEIGHT - block_size - 68.5,62,38)
+    spike = Spike(100, HEIGHT - block_size - 32, 16, 32) #Reference for inputing in the map
+    bigplastic = Big_Plastic(100, HEIGHT - block_size - 115, 41, 59) #Reference for inputing in the map
+    mug = Mug(100, HEIGHT - block_size - 55, 31, 31)  #Reference for inputing in the map
+    cup = Cup(100, HEIGHT - block_size - 90, 30, 48) #Reference for inputing in the map
+    metalcan= Metalcan(100, HEIGHT - block_size - 88, 22, 44) #Reference for inputing in the map
+    pizza= Pizza(100, HEIGHT - block_size - 68.5,62,38) #Reference for inputing in the map
     key1= Key1(50, HEIGHT - block_size - 32, 32, 32)
     key2= Key2(100, HEIGHT - block_size - 32, 32, 32)
     key3= Key3(150, HEIGHT - block_size - 32, 32, 32)
@@ -586,12 +598,12 @@ def main(window):
                Cup(block_size * 275, HEIGHT - block_size - 90, 30, 48), Cup(block_size * 276, HEIGHT - block_size - 90, 30, 48),
                Cup(block_size * 277, HEIGHT - block_size - 90, 30, 48),Cup(block_size * 278, HEIGHT - block_size - 90, 30, 48),
                Block(block_size * 282, HEIGHT - block_size * 2, block_size), Block(block_size * 283, HEIGHT - block_size * 2, block_size),
-               Block(block_size * 285.5, HEIGHT - block_size * 2, block_size), Block(block_size * 286.5, HEIGHT - block_size * 2, block_size),
-               Key3(block_size * 284.5, HEIGHT - block_size - 64, 32, 32),
+               Block(block_size * 286, HEIGHT - block_size * 2, block_size), Block(block_size * 287, HEIGHT - block_size * 2, block_size),
+               Key3(block_size * 285, HEIGHT - block_size - 64, 32, 32),
                Spike(block_size * 282, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 282.5, HEIGHT - block_size*2 - 32, 16, 32),
                Spike(block_size * 283, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 283.5, HEIGHT - block_size*2 - 32, 16, 32),
-               Spike(block_size * 285.6, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 286.1, HEIGHT - block_size*2 - 32, 16, 32),
-               Spike(block_size * 286.6, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 287.1, HEIGHT - block_size*2 - 32, 16, 32),
+               Spike(block_size * 286, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 286.5, HEIGHT - block_size*2 - 32, 16, 32),
+               Spike(block_size * 287, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 287.5, HEIGHT - block_size*2 - 32, 16, 32),
                Spike(350, HEIGHT - block_size - 32, 16, 32),Spike(1560, HEIGHT - block_size - 32, 16, 32),Metalcan(block_size * 6.5, HEIGHT - block_size - 88, 22, 44)]
 
     scroll_offset = 0
@@ -612,7 +624,7 @@ def main(window):
                     player.jump()
 
         player.loop(FPS)
-        handle_move(player, objects)
+        objects = handle_move(player, objects)
         draw(window, background_tiles, bg_image, player, objects, scroll_offset)
 
         if player.points >= 3:  # Assuming there are 3 keys
