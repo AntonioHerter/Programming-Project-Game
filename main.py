@@ -1,18 +1,30 @@
 '''
-Tag designer creator:
-'''
+Tag designer creator(s):
+-Character:
+The palette used is The Perfect Palette 2.0 Palette
+Using Dino Characters by @ScissorMarks as a template
+Author	ChaosWitchNikol
+Tags	16-bit, Animals, Animation, Characters, Colorful, Pixel Art, Retro, spri
+Asset license	Creative Commons Attribution v4.0 International
 
-'''
-Next TO-DOs:
--delete evrything with "GAME PROJECT" (photos)
--review comments
--citations
+- Tile set:
+Jesse M / Twitter - @Jsf23Art
+
+-Objects:
+Copyright/Attribution Notice: 
+Recycle items art by Clint Bellanger
+
+-Keys:
+Author: 
+BizmasterStudios
+Thursday, August 31, 2017 - 23:23
+
+Song: "Mario Type beat" by RCCrawlersfourlife
+
 '''
 
 # Import necessary libraries -  Remember to check if any of then were forgotten
 import pygame # Main game library for creating the game
-import random # For random number generation
-import math # For mathematical operations
 import os # For file path operations
 from os import listdir # To list all files in a directory
 from os.path import isfile, join # To work with file paths and check file
@@ -54,7 +66,7 @@ def load_sprite_sheets(dir1, dir2, width, height, direction=False):
     Returns:
         dict: Dictionary of sprite animations.
     """
-    path = join("GAME PROJECT", "assets", dir1, dir2) # Builds the path to the folder containing the sprite sheets
+    path = join("assets", dir1, dir2) # Builds the path to the folder containing the sprite sheets
     images = [f for f in listdir(path) if isfile(join(path, f))] # Lists all files in the folder
 
     all_sprites = {} # Dictionary to hold all loaded sprites
@@ -86,7 +98,7 @@ def get_block(size):
     Returns:
         pygame.Surface: Scaled block surface.
     """
-    path = join("GAME PROJECT", "assets", "Terrain", "jungle tileset.png") # Path to the terrain image
+    path = join("assets", "Terrain", "jungle tileset.png") # Path to the terrain image
     image = pygame.image.load(path).convert_alpha() # Loads the terrain sprite sheet with transparency
     surface = pygame.Surface((size, size), pygame.SRCALPHA, 32) # Creates a blank surface for the block
     rect = pygame.Rect(76, 33, size, size) # Defines the rectangle of the block to extract
@@ -333,7 +345,7 @@ def get_background(name):
         list: Positions of tiled background.
         pygame.Surface: Background image.
     """
-    image = pygame.image.load(join("GAME PROJECT", "assets", "Background", name)) # Load background image
+    image = pygame.image.load(join("assets", "Background", name)) # Load background image
     _, _, width, height = image.get_rect() # Get dimensions of the image
     tiles = [] # List to store tile positions
 
@@ -461,7 +473,7 @@ def main(window):
     game_clock= pygame.time.Clock()
     background_tiles, bg_image = get_background("green.png")
 
-    pygame.mixer.music.load("GAME PROJECT/Sounds/Background.mp3")
+    pygame.mixer.music.load("./Sounds/Background.mp3")
     pygame.mixer.music.set_volume(0.3)
     pygame.mixer.music.play(-1,0.0)
 
@@ -598,13 +610,15 @@ def main(window):
                Cup(block_size * 275, HEIGHT - block_size - 90, 30, 48), Cup(block_size * 276, HEIGHT - block_size - 90, 30, 48),
                Cup(block_size * 277, HEIGHT - block_size - 90, 30, 48),Cup(block_size * 278, HEIGHT - block_size - 90, 30, 48),
                Block(block_size * 282, HEIGHT - block_size * 2, block_size), Block(block_size * 283, HEIGHT - block_size * 2, block_size),
-               Block(block_size * 286, HEIGHT - block_size * 2, block_size), Block(block_size * 287, HEIGHT - block_size * 2, block_size),
-               Key3(block_size * 285, HEIGHT - block_size - 64, 32, 32),
-               Spike(block_size * 282, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 282.5, HEIGHT - block_size*2 - 32, 16, 32),
+               Block(block_size * 284, HEIGHT - block_size * 2, block_size),Block(block_size * 285, HEIGHT - block_size * 2, block_size),
+               Block(block_size * 286, HEIGHT - block_size * 2, block_size),Spike(block_size * 282, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 282.5, HEIGHT - block_size*2 - 32, 16, 32),
                Spike(block_size * 283, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 283.5, HEIGHT - block_size*2 - 32, 16, 32),
+               Spike(block_size * 284, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 284.5, HEIGHT - block_size*2 - 32, 16, 32),
+               Spike(block_size * 285, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 285.5, HEIGHT - block_size*2 - 32, 16, 32),
                Spike(block_size * 286, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 286.5, HEIGHT - block_size*2 - 32, 16, 32),
-               Spike(block_size * 287, HEIGHT - block_size*2 - 32, 16, 32), Spike(block_size * 287.5, HEIGHT - block_size*2 - 32, 16, 32),
+               Key3(block_size * 287, HEIGHT - block_size*4.5 - 64, 32, 32),
                Spike(350, HEIGHT - block_size - 32, 16, 32),Spike(1560, HEIGHT - block_size - 32, 16, 32),Metalcan(block_size * 6.5, HEIGHT - block_size - 88, 22, 44)]
+
 
     scroll_offset = 0
     scroll_area_width = 300
@@ -637,7 +651,7 @@ def main(window):
              # Recreate keys when the player resets
             key1 =Key1(block_size * 76, HEIGHT - block_size -64, 32, 32)
             key2 = Key2(block_size * 112, HEIGHT - block_size*6 - 64, 32, 32)
-            key3 = Key3(block_size * 284, HEIGHT - block_size - 64, 32, 32)
+            key3 = Key3(block_size * 287, HEIGHT - block_size*4.5 - 64, 32, 32)
             objects = [obj for obj in objects if obj.name not in ["key1", "key2", "key3"]]  # Remove old keys
             objects.extend([key1, key2, key3])  # Add keys back to the objects list
 
@@ -647,7 +661,7 @@ def main(window):
              # Recreate keys when the player resets
             key1 =Key1(block_size * 76, HEIGHT - block_size -64, 32, 32)
             key2 = Key2(block_size * 112, HEIGHT - block_size*6 - 64, 32, 32)
-            key3 = Key3(block_size * 284.5, HEIGHT - block_size - 64, 32, 32)
+            key3 = Key3(block_size * 287, HEIGHT - block_size*4.5 - 64, 32, 32),
             objects = [obj for obj in objects if obj.name not in ["key1", "key2", "key3"]]  # Remove old keys
             objects.extend([key1, key2, key3])  # Add keys back to the objects list
 
